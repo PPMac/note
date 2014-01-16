@@ -35,9 +35,10 @@ rmdir
 stat
 
 * 查看一个文件的详细信息
+
 ```bash
 $ stat a
-  File: `a'
+  File: 'a'
     Size: 5             Blocks: 8          IO Block: 4096   regular file
     Device: 807h/2055dInode: 1048658     Links: 1
     Access: (0644/-rw-r--r--)  Uid: ( 1000/linliang)   Gid: ( 1000/linliang)
@@ -73,6 +74,7 @@ sort
 * -k 指定排序的位置,初始值是1
 
 如按user id排序
+
 ```bash
 sort -t ':' -k 3 -n /etc/passwd
 ```
@@ -105,6 +107,7 @@ set
 uset
 
 * 删除一个环境变量, 但是如果在一个子进程中删除了一个全局变量，它只对子进程有效，该变量在父进程中依然有效
+
 ```bash
 $ a=test
 $ export a
@@ -127,6 +130,7 @@ $
 alias
 
 * -p 查看当前设置了哪些别名
+
 
 usermod
 

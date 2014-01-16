@@ -1,7 +1,58 @@
+# MYSQL 学习笔记
+2014-01-16 20:27
+
+
 ## mysql信息查看
 
+* SQL语句主要分为3类
+
+    * DDL (Data Definition Languages) 数据定义语句, 常用语句关键字如: create, drop, alert.
+    * DML (Data Manipulation Languages) 数据操纵语句，常用语句关键字如: insert, delete, update, select.
+    * DCL (Data Control Languages)  数据控制语句， 控制不同数据的访问级别。常用语句关键字如: grant, revoke.
+
+* 常用的DDL语句
+
+    * 创建表
+
+    <pre>
+    CREATE TABLE tablename (
+            column_name_1 column_type1 constraints,
+            column_name_2 column_type2 constraints,
+            ...
+            )
+    </pre>
+
+    * 删除表
+
+    <pre>
+    DROP TABLE tablename
+    </pre>
+
+    * 修改表
+
+    1. 修改表类型
+
+    ```sql
+    -- 语法
+    ALTER TABLE tablename MODIFY [COLUMN] column_definition [FIRST | AFTER col_name]
+
+    -- 将emp表ename列类型修改为varchar(20)
+    ALTER TABLE emp modify ename varchar(20);
+    ```
+
+    2. 更多操作
+
+    ```sql
+    mysql> help  alter table
+    ```
+
+* 显示创建表的SQL语句
+
+```sql
+mysql> show create table table_name
+
 * 显示表列
-	
+
 ```sql
 mysql> show columns from table_name
 
@@ -160,4 +211,3 @@ mysql> select cust_id, cust_email from customers where cust_email != 'ylee@coyot
 从上面的例子可以看出，NULL行并没有被返回。
 
 因此，在过滤数据时，一定要验证返回的数据中确实给出了被过滤列具有NULL的行。
-

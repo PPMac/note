@@ -962,12 +962,18 @@ True
 
 ## 函数
 
-* 函数的定义  def foo(): pass
-* 返回值     def foo(n): return n + 1
-* 位置参数   def foo(a, b):pass (参数多的时候，位置难记)
-* 默认参数   def foo(a="hello", b='world'): pass
-* 收集参数   def foo(a, b, *args, **kwargs): pass
-```
+* 函数的定义
+`def foo(): pass`
+* 返回值
+`def foo(n): return n + 1`
+* 位置参数
+`def foo(a, b):pass (参数多的时候，位置难记)`
+* 默认参数
+`def foo(a="hello", b='world'): pass`
+* 收集参数
+`def foo(a, b, *args, **kwargs): pass`
+
+```python
 def foo(*args):
     for i in args:
         print i
@@ -987,7 +993,6 @@ bar(name="Jack", age=12)
 
 user = {"name": "Jack", "age": 12}
 bar(**user)
-
 ```
 
 ## 异常
@@ -1010,7 +1015,8 @@ except:
 else:
 ......
 finally:
-```
+
+```python
 try:
     x = 1 / 2
     print x
@@ -1031,11 +1037,14 @@ finally:
     print "DONE"
 
 ```
+
 ## 程序调试
 print
 trace 模块
-python -m trace --trace script.py |grep '^(mod1.py|mod2.py)'
+`python -m trace --trace script.py |grep '^(mod1.py|mod2.py)'`
+
 shell (http://qixinglu.com/post/embed_python_shell_in_code.html)
+
 ```
 def foo():
     text = "hello world"
@@ -1058,7 +1067,9 @@ def bar():
     print text
 
 bar()
+
 # 在调试时修改变量的值并不会影响代码里的变量
+
 ```
 pdb (http://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/)
 python -m pdb myscript.py

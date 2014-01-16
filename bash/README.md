@@ -1138,18 +1138,23 @@ widget 是控件的名字
 parameters 定义了部件窗口的大些以及部件需要的文本
 
 每个dialog部件都提供了两种格式的输出：
-1.使用STDERR
-2.使用退出状态码
+
+1. 使用STDERR
+2. 使用退出状态码
+
 dialog命令的退出状态决定了用户选择的按钮，选过选了了Yes或OK键，dialog命令会返回退出状态码0.如果选择了Cancel或No按钮，dialog命令会返回退出
 状态码为1.
 如果部件返回了任何数据，比如菜单选择，那么dialog命令会将数据发送到STDERR
 dialog --inputbox "Enter your age:" 10 20 2>age.txt
 上面的10,20指定了窗口的大小，age.txt里面保存了用户的输入
+
+<pre>
 dialog --title Testing --msgbox "This is a test" 10 20
 dialog --title "Please answer: " --yesno "Is this thing on" 10 20
 dialog --textbox /etc/passwd 15 45
 dialog --menu "Sys Admin menu" 20 30 10 1 "Display disk space" 2  "Display users" 3 "Display memeory usage" 4 "Exit Progame" 2>test.txt
 dialog --title "Select a file" --fselect $HOME/ 10 20 2>file.txt
+</pre>
 
 使用dialog的一个例子
 
@@ -1247,7 +1252,9 @@ c b c a g a
 sed编起起中的两种形式的行寻址
 * 行的数字范围
 * 用文本模式过滤行
+
 格式:
+
 ```bash
 [address]command
 或
@@ -1327,6 +1334,7 @@ This is line number 6
 插入(insert)命令i会在指定行前增加一行
 追加(append)命令a会在指定行后增加一行
 格式如下：
+
 ```bash
 ## sed '[address]command \ newline'
 
@@ -1338,10 +1346,12 @@ $ echo "Test line 2" |sed 'a\Test line 1'
 Test line 2
 Test line 1
 ```
+
 上面可以给数据刘中的文本前面或后面添加文本，但是如何添加到数据流里面呢？
 要给数据流中出入或附加数据，必须用寻址来告诉sed你想让数据出现在什么位置。
 你可以在用这些命令时执行一个行地址。可以匹配一个数字行号或文本模式，但不能用地址区间，
 这不符合逻辑，因为你只能将文本插入或附件到单个行的前面或后面，而不能是行区间的前面或后面
+
 ```bash
 $ cat a
 This is line number 1
@@ -1788,6 +1798,7 @@ $ sed '=' b |sed 'N; s/\n/ /'
 正则表达式
 正则表达式是基于正则表达式引擎实现的
 Linux中流行的两种正则表达式引擎
+
 * POSIX基本的正则表达式引擎(BRE)引擎
 * POSIX扩展的正则表达式引擎(ERE)引擎
 

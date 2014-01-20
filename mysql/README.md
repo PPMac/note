@@ -1,7 +1,6 @@
 # MYSQL 学习笔记
 2014-01-16 20:27
 
-
 ## mysql 帮助信息查看
 ```sql
 
@@ -32,7 +31,6 @@ categories:
    Utility
 ```
 
-## mysql信息查看
 
 * SQL语句主要分为3类
 
@@ -62,21 +60,21 @@ categories:
 
     * 修改表
 
-    1. 修改表类型
+        1. 修改表类型
 
-    ```sql
-    -- 语法
-    ALTER TABLE tablename MODIFY [COLUMN] column_definition [FIRST | AFTER col_name]
+        ```sql
+        -- 语法
+        ALTER TABLE tablename MODIFY [COLUMN] column_definition [FIRST | AFTER col_name]
 
-    -- 将emp表ename列类型修改为varchar(20)
-    ALTER TABLE emp modify ename varchar(20);
-    ```
+        -- 将emp表ename列类型修改为varchar(20)
+        ALTER TABLE emp modify ename varchar(20);
+        ```
 
-    2. 更多操作
+        2. 更多操作
 
-    ```sql
-    mysql> help  alter table
-    ```
+        ```sql
+        mysql> help  alter table
+        ```
 
 * 常用的DDL语句
 
@@ -88,6 +86,8 @@ mysql> grant select, insert on dabasename.* to 'user1'@'localhost' indentified b
 -- 移除权限
 mysql> revoke select, insert on dabasename.* to 'user1'@'localhost' indentified by 'password';
 ```
+
+## mysql信息查看
 
 * 显示创建表的SQL语句
 
@@ -306,7 +306,7 @@ mysql> select vend_id, count(1) from products group by vend_id;
 4 rows in set (0.01 sec)
 
 
--- 即要统计各个vend的总数, 又要统计所有的总数
+-- 既要统计各个vend的总数, 又要统计所有的总数
 mysql> select vend_id, count(1) from products group by vend_id with
 rollup;
 +---------+----------+
@@ -321,7 +321,7 @@ rollup;
 5 rows in set (0.00 sec)
 
 
--- 即要统计各个vend的总数, 又要统计所有的总数, 并对条件做筛选。
+-- 既要统计各个vend的总数, 又要统计所有的总数, 并对条件做筛选。
 -- 注意所有的总数仍然没有变，这是因为having是对聚合后的结果做筛选。
 mysql> select vend_id, count(1) from products group by vend_id with rollup
 having count(1)> 3;
@@ -571,6 +571,119 @@ mysql> select vend_id from vendors union select vend_id from products;
 6 rows in set (0.01 sec)
 
 ```
+
+* 同配符
+% : 表示任何字符出现任意次数
+_ : 表示匹配单个字符
+
+```sql
+mysql> select prod_id, prod_name from products where prod_name LIKE '_ ton anvil';
++---------+-------------+
+| prod_id | prod_name   |
++---------+-------------+
+| ANV02   | 1 ton anvil |
+| ANV03   | 2 ton anvil |
++---------+-------------+
+2 rows in set (0.00 sec)
+```
+
+* 正则表达式
+
+使用REGEXP关键字
+```sql
+mysql> select prod_name from products where prod_name REGEXP '1000' order by prod_name;
++--------------+
+| prod_name    |
++--------------+
+| JetPack 1000 |
++--------------+
+1 row in set (0.25 sec)
+
+
+-- 需要注意的是: 在mysql中，转移需要使用'\\'。
+mysql> select vend_name from vendors where vend_name REGEXP '\\.';
++--------------+
+| vend_name    |
++--------------+
+| Furball Inc. |
++--------------+
+1 row in set (0.03 sec)
+
+
+-- 简单的正则表达式测试
+-- 可以在不使用数据库表的情况下使用SELECT来测试正则表达式，REGEXP检查总是返回0（没有匹配）或1（匹配）。
+mysql> select 'hello' REGEXP '[0-9]';
++------------------------+
+| 'hello' REGEXP '[0-9]' |
++------------------------+
+|                      0 |
++------------------------+
+1 row in set (0.00 sec)
+```
+
+* 字符串拼接
+
+MYSQL使用Concat()函数来实现，而大多数其他的DBMS使用 + 来实现
+```sql
+mysql> help Concat
+Name: 'CONCAT'
+Description:
+Syntax:
+CONCAT(str1,str2,...)
+
+Returns the string that results from concatenating the arguments. May
+have one or more arguments. If all arguments are nonbinary strings, the
+result is a nonbinary string. If the arguments include any binary
+strings, the result is a binary string. A numeric argument is converted
+to its equivalent string form. This is a nonbinary string as of MySQL
+5.5.3. Before 5.5.3, it is a binary string; to to avoid that and
+produce a nonbinary string, you can use an explicit type cast, as in
+this example:
+
+SELECT CONCAT(CAST(int_col AS CHAR), char_col);
+
+CONCAT() returns NULL if any argument is NULL.
+
+URL: http://dev.mysql.com/doc/refman/5.5/en/string-functions.html
+
+Examples:
+mysql> SELECT CONCAT('My', 'S', 'QL');
+        -> 'MySQL'
+mysql> SELECT CONCAT('My', NULL, 'QL');
+        -> NULL
+mysql> SELECT CONCAT(14.3);
+        -> '14.3'
+```
+
+## MySQL函数
+
+大多数的SQL支持一下类型的函数
+
+* 用于处理文本（如删除或填充，转换值为大写或小写）的文本函数
+* 用于在数值数据上进行算术操作（如返回绝对值，进行代数运算）
+* 用于处理日期和时间并从这些值中提取特定成分(例如，返回两个日期之差，检查日期有效性）的日期和时间函数
+* 返回DBMS正在使用的特殊信息（如返回用户登录信息，检查版本细节）的系统函数
+
+常见的文本处理函数
+
+|  函数       |      说明        |
+|--------------------------------|
+| Left()      | 返回串左边的函数 |
+| Right()     | 返回串右边的字符 |
+| Length()    | 返回串的长度     |
+| Locate()    | 找出串的一个子串 |
+| Lower()     | 将串返回小写     |
+| Upper()     | 将串转换为大写   |
+| LTrim()     | 去掉串左边的空格 |
+| RTrim()     | 去掉串右边的空格 |
+| Soundex()   | 返回串的SOUNDEX值|
+| SubString() | 返回子串的字符   |
+
+具体使用自行查看帮助`help 函数名`
+
+SOUNDEX 是一个将任何文本串转换为描述其语音表示的字母数字模式的算法，SOUNDEX考虑了类似的发音字符和音节，
+使得能对串进行发音比较而不是字母比较。
+
 
 ## MySQL支持的数据类型
 

@@ -576,7 +576,7 @@ mysql> select vend_id from vendors union select vend_id from products;
 
 ### 数值类型
 
-<table border="1" >
+<table>
     <caption>MySQL中的数值类型</caption>
     <tr>
         <th>整数类型</th>

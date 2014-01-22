@@ -771,3 +771,237 @@ SOUNDEX 是一个将任何文本串转换为描述其语音表示的字母数字
         <td>BIT(8)</td>
     </tr>
 </table>
+
+
+对于整数类型，MySQL还支持在类型名称后面的小括号制定显示宽度，例如int(5)表示宽度小于5位的时候在前面填充宽度，如果不指定则默认宽度为int(11).
+当插入的数据超过了设置宽度时，仍然可以插入数据，只是宽度格式就没有任何意义了。
+
+```sql
+mysql> create table t1(id1 int, id2 int(5));
+Query OK, 0 rows affected (0.11 sec)
+
+mysql> insert into t1 values(1, 1);
+Query OK, 1 row affected (0.06 sec)
+
+mysql> select * from t1;
++------+------+
+| id1  | id2  |
++------+------+
+|    1 |    1 |
++------+------+
+1 row in set (0.00 sec)
+
+mysql> desc t1;
++-------+---------+------+-----+---------+-------+
+| Field | Type    | Null | Key | Default | Extra |
++-------+---------+------+-----+---------+-------+
+| id1   | int(11) | YES  |     | NULL    |       |
+| id2   | int(5)  | YES  |     | NULL    |       |
++-------+---------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> alter table t1 modify id1 int zerofill;
+Query OK, 1 row affected (0.30 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+mysql> desc t1;
++-------+---------------------------+------+-----+---------+-------+
+| Field | Type                      | Null | Key | Default | Extra |
++-------+---------------------------+------+-----+---------+-------+
+| id1   | int(10) unsigned zerofill | YES  |     | NULL    |       |
+| id2   | int(5)                    | YES  |     | NULL    |       |
++-------+---------------------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> select * from t1;
++------------+------+
+| id1        | id2  |
++------------+------+
+| 0000000001 |    1 |
++------------+------+
+1 row in set (0.00 sec)
+```
+
+对于小数的表示，MySQL分为两种方式: 浮点数和定点数。 浮点数包括float(单精度)和double(双精度), 而定点数则只有一种表示。
+定点数在MySQL内部以字符串的形式存放，比浮点数更精确， 适合用来存放货币等精度高的数据。
+
+浮点数和定点数都可以用类型名称后面加"(M, D)"的方式来表示，“(M, D)"表示该值一共显示M位数字（整数位 + 小数位),其中D位于小数点后面， M和D又称为**精度**和**标度**。
+
+float和double在不指定精度时，默认会按照实际的精度(由实际的硬件和操作系统来决定)来显示，而decimal在不指定精度的时候，默认的整数数位为10, 默认的小数数位为0.
+
+```sql
+-- 创建表
+mysql> create table t2(id1 float(5,2), id2 double(5, 2), id3 decimal(5,2));
+Query OK, 0 rows affected (0.12 sec)
+
+mysql> desc t2;
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| id1   | float(5,2)   | YES  |     | NULL    |       |
+| id2   | double(5,2)  | YES  |     | NULL    |       |
+| id3   | decimal(5,2) | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+-- 插入数据1.23， 没有异常
+mysql> insert into t2 values(1.23, 1.23, 1.23);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> select * from t2;
++------+------+------+
+| id1  | id2  | id3  |
++------+------+------+
+| 1.23 | 1.23 | 1.23 |
++------+------+------+
+1 row in set (0.02 sec)
+
+-- 向id1, id2 插入数据1.234， id3插入1.23
+mysql> insert into t2 values(1.234, 1.234, 1.23);
+Query OK, 1 row affected (0.04 sec)
+
+-- 可以看到id1, id2 由于精度限制，最后一位四舍五入了
+mysql> select * from t2;
++------+------+------+
+| id1  | id2  | id3  |
++------+------+------+
+| 1.23 | 1.23 | 1.23 |
+| 1.23 | 1.23 | 1.23 |
++------+------+------+
+2 rows in set (0.00 sec)
+
+-- 都插入数据1.23， 出现警告
+mysql> insert into t2 values(1.234, 1.234, 1.234);
+Query OK, 1 row affected, 1 warning (0.08 sec)
+
+-- id3由于精度限制被截断了
+mysql> show warnings;
++-------+------+------------------------------------------+
+| Level | Code | Message                                  |
++-------+------+------------------------------------------+
+| Note  | 1265 | Data truncated for column 'id3' at row 1 |
++-------+------+------------------------------------------+
+1 row in set (0.01 sec)
+
+mysql> select * from t2;
++------+------+------+
+| id1  | id2  | id3  |
++------+------+------+
+| 1.23 | 1.23 | 1.23 |
+| 1.23 | 1.23 | 1.23 |
+| 1.23 | 1.23 | 1.23 |
++------+------+------+
+3 rows in set (0.00 sec)
+
+-- 去掉id1, id2, id3的精度限制
+mysql> alter table t2 modify id1 float;
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table t2 modify id2 float;
+Query OK, 3 rows affected (0.24 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> alter table t2 modify id3 decimal;
+Query OK, 3 rows affected, 3 warnings (0.26 sec)
+Records: 3  Duplicates: 0  Warnings: 3
+
+-- 可以看到decimal的默认精度限制为(10, 0)
+mysql> desc t2;
++-------+---------------+------+-----+---------+-------+
+| Field | Type          | Null | Key | Default | Extra |
++-------+---------------+------+-----+---------+-------+
+| id1   | float         | YES  |     | NULL    |       |
+| id2   | float         | YES  |     | NULL    |       |
+| id3   | decimal(10,0) | YES  |     | NULL    |       |
++-------+---------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> insert into t2 values(1.234, 1.234, 1.234);
+Query OK, 1 row affected, 1 warning (0.07 sec)
+
+mysql> show warnings ;
++-------+------+------------------------------------------+
+| Level | Code | Message                                  |
++-------+------+------------------------------------------+
+| Note  | 1265 | Data truncated for column 'id3' at row 1 |
++-------+------+------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> select * from t2;
++-------+-------+------+
+| id1   | id2   | id3  |
++-------+-------+------+
+|  1.23 |  1.23 |    1 |
+|  1.23 |  1.23 |    1 |
+|  1.23 |  1.23 |    1 |
+| 1.234 | 1.234 |    1 |
++-------+-------+------+
+4 rows in set (0.00 sec)
+
+```
+
+对于BIT(位）类型，用于存放位字段值， BIT(M)可以用来存放多位二进制数，
+M范围从1～64, 如果不写默认为1位，对于位字段，直接使用
+SELECT命令将看不到结果，可以用bin()(显示为二进制格式）或者hex()（显示为十六进制格式）函数进行读取。
+```sql
+mysql> create table te (id BIT);
+Query OK, 0 rows affected (0.12 sec)
+
+-- 插入的BIT类型默认为1位
+
+mysql> desc te;
++-------+--------+------+-----+---------+-------+
+| Field | Type   | Null | Key | Default | Extra |
++-------+--------+------+-----+---------+-------+
+| id    | bit(1) | YES  |     | NULL    |       |
++-------+--------+------+-----+---------+-------+
+1 row in set (0.00 sec)
+
+mysql> insert into te values(1);
+Query OK, 1 row affected (0.05 sec)
+
+-- 直接用select是看不到结果的
+mysql> select * from te;
++------+
+| id   |
++------+
+|      |
++------+
+1 row in set (0.02 sec)
+
+mysql> select bin(id), hex(id) from te;
++---------+---------+
+| bin(id) | hex(id) |
++---------+---------+
+| 1       | 1       |
++---------+---------+
+1 row in set (0.00 sec)
+
+-- 数据插入bit类型字段时，首先转换为二进制，如果位数允许，将成功插入。
+-- 2的二进制码是"10", 超过位数1, 插入失败。
+mysql> insert into te values(2);
+Query OK, 1 row affected, 1 warning (0.04 sec)
+
+mysql> show warnings ;
++---------+------+---------------------------------------------+
+| Level   | Code | Message                                     |
++---------+------+---------------------------------------------+
+| Warning | 1264 | Out of range value for column 'id' at row 1 |
++---------+------+---------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> select bin(id), hex(id) from te;
++---------+---------+
+| bin(id) | hex(id) |
++---------+---------+
+| 1       | 1       |
+| 1       | 1       |
++---------+---------+
+2 rows in set (0.00 sec)
+
+mysql>
+
+```
+
+### 日期时间类型

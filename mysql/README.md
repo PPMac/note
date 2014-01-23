@@ -1005,3 +1005,36 @@ mysql>
 ```
 
 ### 日期时间类型
+
+* 如果要用来表示年月日，通常用DATE表示
+* 如果要用来表示年月日时分秒，通常用DATETIME表示
+* 如果要用来表示时分秒，通常用TIME表示
+* 如果需要经常插入或者更新为当前系统时间，通常用TIMESTAMP来表示
+* 如果只表示年份，可以用YEAR, 它比DATE占用更少的时间
+
+```sql
+mysql> create table t(d date, t time, dt datetime);
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> desc t;
++-------+----------+------+-----+---------+-------+
+| Field | Type     | Null | Key | Default | Extra |
++-------+----------+------+-----+---------+-------+
+| d     | date     | YES  |     | NULL    |       |
+| t     | time     | YES  |     | NULL    |       |
+| dt    | datetime | YES  |     | NULL    |       |
++-------+----------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> insert into t values(now(), now(), now());
+Query OK, 1 row affected, 1 warning (0.09 sec)
+
+mysql> select * from t;
++------------+----------+---------------------+
+| d          | t        | dt                  |
++------------+----------+---------------------+
+| 2014-01-23 | 11:32:18 | 2014-01-23 11:32:18 |
++------------+----------+---------------------+
+1 row in set (0.01 sec)
+
+```

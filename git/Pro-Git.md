@@ -1,23 +1,26 @@
 ## Pro Git Learn
 
-1. 初次运行git前的配置
+* 初次运行git前的配置
 
 系统级别：`git config --system` (配置文件保存在`/etc/gitconfig`)
+
 用户级别：`git config --global` (配置文件保存在`~/.gitconfig`)
+
 当前项目的配置文件保存在工作目录的`.git/config`文件中
 
 如果上面的配置都存在的话，配置信息会依次覆盖，当前项目>用户级别>系统级别
 
-配置文本编辑器（git commit时的文本编辑器很难用，用下面的配置使用VIM）
+配置文本编辑器（git commit时的文本编辑器很难用，用下面的配置使用VIM)
+
 `git config --global core.editor vim`
 
 配置差异分析工具
 `git config --global merge.tool meld`
 
-在有冲突时，使用git mergetool可以比较冲突
+在有冲突时，使用`git mergetool`可以比较冲突
 
 
-2. 忽略某些文件
+* 忽略某些文件
 
 一般我们总会有些文件无需纳入Git的管理,也不希望它们总出现在未跟踪文件列表。通常都是些自动生
 成的文件,像是日志或者编译过程中创建的等等。我们可以创建一个名为`.gitignore`的文件,列出要忽略的
@@ -31,8 +34,11 @@ $ cat .gitignore
 
 第一行告诉 Git 忽略所有以 .o 或 .a 结尾的文件。一般这类对象文件和存档文件都是编译过程中出现
 的,我们用不着跟踪它们的版本。
+
 第二行告诉 Git 忽略所有以波浪符(~)结尾的文件,许多文本编辑软件(比如 Emacs)都用这样的文件名保存副本。
-此外,你可能还需要忽略 log,tmp 或者 pid 目录,以及自动生成的文档等等。要养成一开始就设置好 .gitignore 文件的习惯,以免将来误提交这类无用的文件。
+此外,你可能还需要忽略 log,tmp 或者 pid 目录,以及自动生成的文档等等。
+
+要养成一开始就设置好 .gitignore 文件的习惯,以免将来误提交这类无用的文件。
 
 文件 .gitignore 的格式规范如下:
 
@@ -75,15 +81,19 @@ git diff --cached
 
 git mv
 就相当于运行了下面三条命令:
+```
 $ mv README.txt README
 $ git rm README.txt
 $ git add README
-
+```
 * 提交记录查看
 
 git log -p（显示每次提交的详细信息）
+
 git log -p -2 （显示最近两次提交的信息）
+
 git log --stat
+
 
 | 选项                |  说明
 | ------------------- | -----------------------------------
@@ -103,8 +113,9 @@ git log --stat
 | --committer         |  仅显示指定提交者相关的提交。
 
 
- git log --pretty=format指定显示格式
- git log --pretty=format:"%h - %an, %ar : %s"
+git log --pretty=format指定显示格式
+
+git log --pretty=format:"%h - %an, %ar : %s"
 
 | 选项    |  说明
 | ------- | ----------------------------------------
@@ -148,9 +159,12 @@ b0ad11e - pull: allow "git pull origin $something:$cur
 列出标签：`git tag`
 
 git使用的标签有两种类型:轻量级的(lightweight)和含附注的(annotated)。
+
 轻量级标签就像是个不会变化的分支,实际上它就是个指向特定提交对象的引用。
+
 而含附注标签,实际上是存储在仓库中的一个独立对象,它有自身的校验和信息,包含着标签的名字,电子邮件地址和日期,以及标签说明,标签本身也允许使
 用 GNU Privacy Guard (GPG) 来签署或验证。
+
 一般我们都建议使用含附注型的标签,以便保留相关信息;当然,如果只是临时性加注标签,或者不需要旁注额外信息,用轻量级标签也没问题。
 
 **含附注的标签**
@@ -196,13 +210,12 @@ $ git push origin v1.5
 `git push origin --tags`
 
 
-
 * git自动补全
 
-下载git源码
-`git clone git://git.kernel.org/pub/scm/git/git.git`
-将源码源码目录下的
-`git/contrib/completion/git-completion.bash`
+下载git源码`git clone git://git.kernel.org/pub/scm/git/git.git`
+
+将源码源码目录下的`git/contrib/completion/git-completion.bash`
+
 添加到~/.bashrc中也可以为系统上所有用户都设置默认使用此脚本。复制到`/etc/bash_completion.d/`目录中即可
 
 
@@ -218,8 +231,9 @@ $ git config --global alias.st status
 ```
 可以看出,实际上 Git 只是简单地在命令中替换了你设置的别名。不过有时候我们希望运行某个外部命
 令,而非 Git 的附属工具,这个好办,只需要在命令前加上`!`就行。如果你自己写了些处理 Git 仓库信息
-的脚本的话,就可以用这种技术包装起来。作为演示,我们可以设置用
-git visual启动gitk:
+的脚本的话,就可以用这种技术包装起来。
+
+作为演示,我们可以设置用git visual启动gitk:
 `git config --global alias.visual "!gitk"`
 
 查看各个分支最后一次 commit 信息,运行
@@ -244,10 +258,10 @@ git checkout --track [远程名]/[分支名]
 如果不再需要某个远程分支了,比如搞定了某个特性并把它合并进了远程的master分支（或
 稳定代码的地方),可以用这个非常无厘头的语法来删除它:
 ```
-git push [远程名] :[分支名]。如果想在服务器上删
+git push [远程名] :[分支名]
 ```
 
-除serverfix分支(或任何其他存放分支,运行下面的命令:
+如果想在服务器上删除serverfix分支(或任何其他存放分支,运行下面的命令:
 ```
 $ git push origin :serverfix
 To git@github.com:schacon/simplegit.git

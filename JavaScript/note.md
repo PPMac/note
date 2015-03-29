@@ -3,6 +3,8 @@
 1. 术语解释
 ECMA:欧洲计算机制造协会
 
+
+
 第二章 语法结构
 
 1. JavaScript是区分大小写的
@@ -210,11 +212,11 @@ Infinity                |    "Infinity"          |            |   true       |  
 -Infinity               |    "-Infinity"         |            |   true       |  new Number(-Infinity)
 1                       |     "1"                |            |   true       |  new Number(1)
 -----------------------------------------------------------------------------------------------------
-{}(任意对象)            |     见后面            | 见后面      |   true       |
-[](任意数组)            |     ""                |   0         |   true       |
-[9](1个数字元素)        |     "9"               |   9         |   true       |
-['a'](其他数组)         |     使用join()方法    |   NaN       |   true       |
-function(){}(任意函数)  |     见后面            |   NaN       |   ture       |
+{}(任意对象)            |     见后面16           | 见后面16   |   true       |
+[](任意数组)            |     ""                 |   0        |   true       |
+[9](1个数字元素)        |     "9"                |   9        |   true       |
+['a'](其他数组)         |     使用join()方法     |   NaN      |   true       |
+function(){}(任意函数)  |     见后面16           |   NaN      |   ture       |
 -----------------------------------------------------------------------------------------------------
 
 从表中可以看出如下几点：
@@ -294,3 +296,115 @@ parseInt可以接收第二个参数表示指定数字的转换基数
 
 parseInt("11", 2)  // 3
 
+
+
+16. 对象转换为原始值
+
+对象到布尔值的转换非常简单，所有的对象（包括数组和函数）都转换为true。对于包装对象亦是如此: new Boolean(false)是一个对象而不是原始值，它将转换为true。
+
+对象到字符串和对象到数字的转换都是通过调用待转换对象的一个方法来完成的。
+
+JavaScript中的对象到字符串的转换经过了如下这些步骤。
+
+* 如果对象具有toString()方法，则调用这个方法。如果它返回一个原始值，JavaScript将这个值转换为字符串（如果本身不是字符串的话）， 并返回这个字符串结果。
+
+* 如果对象没有toString()方法，或者这个方法并不返回一个原始值，那么JavaScript会调用valueOf()方法。如果存在这个方法，则JavaScript调用它，如果返回值是原始值，
+  JavaScript将这个值转换为字符串（如果本身不是字符串的话）， 并返回这个字符串结果。
+
+* 否则，JavaScript无法从toString()或ValueOf()方法返回一个原始值，因此这时它将抛出一个类型错误异常。
+
+在对象到数字的转换过程中，JavaScript做了同样的事情，只是它会首先尝试使用valueOf()方法。
+
+* 如果对象具有valueOf()方法，则调用这个方法。如果它返回一个原始值，JavaScript将这个值转换为数字（如果本身不是数字的话）， 并返回这个数字结果。
+
+* 如果对象没有valueOf()方法，或者这个方法并不返回一个原始值，那么JavaScript会调用toString()方法。如果存在这个方法，则JavaScript调用它，如果返回值是原始值，
+  JavaScript将这个值转换为数字（如果本身不是数字的话）， 并返回这个数字结果。
+
+* 否则，JavaScript无法从toString()或ValueOf()方法返回一个原始值，因此这时它将抛出一个类型错误异常。
+
+
+对象转换为数字的细节解释了为什么空数组会被转换为数字0以及为什么单个元素的数组同样会转会成一个数字。
+
+数组继承了默认的valueOf()方法，但这个方法返回一个对象而不是原始值，因此，数组到数字的转换会调用toString()方法。空数组转会为空字符串，空字符串转换为数字0.
+含有一个元素的数组转换为字符串的结果和这个元素转换为数字的结果一样。如果数组只包含一个数字元素，这这个数字转换为字符串，再转换为数字。
+
+
+
+17. 变量声明
+
+使用关键字var
+var a,
+var i=1, j=2
+
+声明了一个变量，在给它存入值之前，它的初始值就是undefined
+
+
+18. 变量作用域
+
+一个变量的作用域(scope)是源程序代码中定义这个变量的区域。全局变量拥有全局作用域，函数内声明的变量只在函数内有定义。
+
+在函数体内，局部变量的优先级高于同名变量的全局变量。如果在函数内声明一个局部变量或者在函数参数中带有的变量和全局变量同名，那么全局变量就被局部变量覆盖。
+
+var scope = "global";
+
+function checscope() {
+	var scope = "local";  // 局部变量覆盖全局变量
+	return scope;
+}
+
+checkscope();   // "local"
+
+尽管在全局作用域下声明全局变量可以不写var语句，但是声明局部变量时则必须使用var.
+
+var scope = "global";
+
+function checscope2() {
+	scope = "local"; 
+	myscope = “local”;
+	return [scope, myscope];
+}
+
+checkscope2();   // ["local", "local"]
+scope;    // "local"
+myscope;   // "local"
+
+
+18. 函数作用域和声明提前
+
+在一些类似C语言的编程语言中， 花括号内的每一段代码都有各自的作用域，而且变量在声明它们之前是不可见的，我们成为块级作用域(block scope)。
+而JavaScript中没有块级作用域，取而代之JavaScript使用了函数作用域(function scope)： 变量在声明它们的函数体及这个函数体嵌套的任意函数体内部都是有定义的。
+
+function test(){
+	var i = 0;
+	if (typeof o == 'object'){
+		var j = 0;
+		for (var k=0; k<10; k++){
+			console.log(k);   // 0 -> 9 
+		}
+		console.log(k);  // 10
+	}
+	console.log(j);    // 0
+}
+
+
+JavaScript中所有的变量声明都会被提前到函数顶部，同时函数变量的初始化留在原来的位置。
+
+var scope = "global";
+function f() {
+	console.log(scope);   // undefined, 而不是global
+	var scope = "local";  
+	console.log(scope);  // local
+}
+
+19. 作为属性的变量
+
+当声明一个JavaScipt的全局变量时，实际上是定义了一个全局对象的属性。
+当使用var声明一个变量时，创建的这个对象是不可配置的， 也就是说无法通过delete运算符删除。
+没有使用var时创建的变量是可配置的.
+
+var truevar = 1; //声明一个不可删除的全局变量
+fakevar = 2; // 创建全局对象的一个可删除属性
+this.fakevar2 = 2; // 同上
+delete truevar;  // false, 变量并没有被删除
+delete fakevar;  // true, 变量被删除
+delete this.fakevar2;  // true, 变量被删除

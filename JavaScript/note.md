@@ -465,3 +465,60 @@
     2 in a;  // false
     a.length // 3  注意a的长度并没有发生变化
     ```
+
+第六章 对象
+-----------
+
+1. 属性除了名字和值之外，每个属性还有一些与之相关的值，称为“属性特性”（property attribute）：  
+ * 可写（writable attribute），表明是否可以设置该属性的值。   
+ * 可枚举（enumerable attribute），表明是否可以通过for/in循环返回该属性。   
+ * 可配置（configurable attribute），表明是否可以删除或修改该属性。
+
+
+2. 除了包含属性之外，每个对象还拥有三个相关的对象特性（object attribute）：   
+ * 对象的原型（prototype）指向另外一个对象，本对象的属性继承自它的原型对象。  
+ * 对象的类（class）是一个标识对象类型的字符串。  
+ * 对象的扩展标记（extensible flag）指明了（在EC-MAScript 5中）是否可以向该对象添加新属性。
+
+3. 我们用下面这些术语来对三类JavaScript对象和两类属性作区分：  
+* 内置对象（native object）是由ECMAScript规范定义的对象或类。例如，数组、函数、日期和正则表达式都是内置对象。   
+* 宿主对象（hosTobject）是由JavaScript解释器所嵌入的宿主环境（比如Web浏览器）定义的。客户端JavaScript中表示网页结构的HTMLElement对象均是宿主对象。既然宿主环境定义的方法可以当成普通的JavaScript函数对象，
+那么宿主对象也可以当成内置对象。 * 自定义对象（user-defined object）是由运行中的JavaScript代码创建的对象。
+* 自有属性（own property）是直接在对象中定义的属性。   
+* 继承属性（inherited property）是在对象的原型对象中定义的属性。
+
+4. 创建对象有三种方式：
+
+* 对象直接量
+
+var empty = {}; // 没有任何属性的对象
+var point = { x:0, y:0 }; // 两个属性
+var point2 = { x:point.x, y:point.y+1 }; // 更复杂的值
+
+对象直接量是一个表达式，这个表达式的每次运算都创建并初始化一个新的对象。每次计算对象直接量的时候，也都会计算它的每个属性的值。也就是说，如果在一个重复调用的函数中的循环体内使用了对象直接量，它将创建很多新对象，并且每次创建的对象的属性值也有可能不同。
+
+* 通过new创建对象
+
+var o = new Object(); // 创建一个空对象，和{}一样
+var a = new Array(); // 创建一个空数组，和[]一样
+var d = new Date(); // 创建一个表示当前时间的Date对象
+var r = new RegExp("js"); //创建一个可以进行模式匹配的EegExp对象
+
+* Object.create()
+
+ECMAScript 5定义了一个名为Object.create()的方法，它创建一个新对象，其中第一个参数是这个对象的原型。Object.cre-ate()提供第二个可选参数，用以对对象的属性进行进一步描述。6.7节会详细讲述第二个参数。Object.create()是一个静态函数，而不是提供给某个对象调用的方法。使用它的方法很简单，只须传入所需的原型对象即可：var o1 = Object.create({x:1, y:2}); // o1继承了属性x和y可以通过传入参数null来创建一个没有原型的新对象，但通过这种方式创建的对象不会继承任何东西，甚至不包括基础方法，比如toString()，也就是说，它将不能和“+”运算符一起正常工作：var o2 = Object.create(null); //o2不继承任何属性和方法如果想创建一个普通的空对象（比如通过{}或new Object()创建的对象），需要传入Object.prototype：var o3 = Object.create(Object.prototype); //o3和{}和new Object()一样可以通过任意原型创建新对象（换句话说，可以使任意对象可继承），这是一个强大的特性。
+
+5. 原型
+
+每一个JavaScript对象（null除外）都和另一个对象相关联。“另一个”对象就是我们熟知的原型，每一个对象都从原型继承属性。所有通过对象直接量创建的对象都具有同一个原型对象，并可以通过JavaScript代码Object.prototype获得对原型对象的引用。通过关键字new和构造函数调用创建的对象的原型就是构造函数的prototype属性的值。因此，同使用{}创建对象一样，通过new Object()创建的对象也继承自Object.prototype。同样，通过new Array()创建的对象的原型就是Array.prototype，通过newDate()创建的对象的原型就是Date.prototype。没有原型的对象为数不多，Object.prototype就是其中之一。它不继承任何属性。其他原型对象都是普通对象，普通对象都具有原型。所有的内置构造函数（以及大部分自定义的构造函数）都具有一个继承自Object.prototype的原型。例如，Date.prototype的属性继承自Object.prototype，因此由new Date()创建的Date对象的属性同时继承自Date.prototype和Object.prototype。这一系列链接的原型对象就是所谓的“原型链”（prototype chain）。
+
+
+6. 属性赋值操作首先检查原型链，以此判定是否允许赋值操作。例如，如果o继承自一个只读属性x，那么赋值操作是不允许的。如果允许属性赋值操作，它也总是在原始对象上创建属性或对已有的属性赋值，而不会去修改原型链。在JavaScript中，只有在查询属性时才会体会到继承的存在，而设置属性则和继承无关，这是JavaScript的一个重要特性，该特性让程序员可以有选择地覆盖（override）继承的属性。
+
+7. delete运算符（见4.13.3节）可以删除对象的属性。它的操作数应当是一个属性访问表达式。让人感到意外的是，delete只是断开属性和宿主对象的联系，而不会去操作属性中的属性：
+delete book.author; // book不再有属性
+authordelete book["main title"]; // book也不再有属性"main title"
+
+delete运算符只能删除自有属性，不能删除继承属性（要删除继承属性必须从定义这个属性的原型对象上删除它，而且这会影响到所有继承自这个原型的对象）。
+
+8. 检测属性可以通过in运算符、hasOwnPreperty()和propertyIsEnumerable()方法来完成这个工作，甚至仅通过属性查询也可以做到这一点。对象的hasOwnProperty()方法用来检测给定的名字是否是对象的自有属性。对于继承属性它将返回false，propertyIsEnumerable()是hasOwnProperty()的增强版，只有检测到是自有属性且这个属性的可枚举性（enumerable at-tribute）为true时它才返回true。某些内置属性是不可枚举的。通常由JavaScript代码创建的属性都是可枚举的，除非在EC-MAScript 5中使用一个特殊的方法来改变属性的可枚举性
